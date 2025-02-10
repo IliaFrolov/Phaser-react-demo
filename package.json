@@ -27,6 +27,7 @@
         "build-nolog": "vite build --config vite/config.prod.mjs"
     },
     "dependencies": {
+        "@esotericsoftware/spine-phaser": "^4.2.72",
         "phaser": "^3.87.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"

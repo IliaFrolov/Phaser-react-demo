@@ -1,36 +1,55 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
+import { SpineGameObject } from "@esotericsoftware/spine-phaser"
 
-export class Game extends Scene
-{
+
+export class Game extends Scene {
     camera: Phaser.Cameras.Scene2D.Camera;
     background: Phaser.GameObjects.Image;
     gameText: Phaser.GameObjects.Text;
+    spineBoy: SpineGameObject;
 
-    constructor ()
-    {
+    constructor() {
         super('Game');
-    }
 
-    create ()
-    {
+    }
+    preload() {
+        this.load.spineJson("spineboy", "assets/spineboy/spineboy.json")
+        this.load.spineAtlas("spineboy-atlas", "assets/spineboy/spineboy.atlas")
+    }
+    create() {
         this.camera = this.cameras.main;
         this.camera.setBackgroundColor(0x00ff00);
 
         this.background = this.add.image(512, 384, 'background');
         this.background.setAlpha(0.5);
 
-        this.gameText = this.add.text(512, 384, 'Make something fun!\nand share it with us:\nsupport@phaser.io', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
-            align: 'center'
-        }).setOrigin(0.5).setDepth(100);
+        // Create Spine Object
+        this.spineBoy = this.add.spine(400, 700, "spineboy", "spineboy-atlas");
+        this.spineBoy.animationStateData.defaultMix = 0.2;
 
+        // Play Animation
+        this.spineBoy.animationState.setAnimation(0, "idle", true);
         EventBus.emit('current-scene-ready', this);
     }
+    walk() {
+        this.spineBoy.animationState.setAnimation(0, "walk", true);
+        EventBus.emit('animation-update', 'walk');
+        console.log("walk");
+    }
+    run() {
+        this.spineBoy.animationState.setAnimation(0, "run", true);
+        EventBus.emit('animation-update', 'run');
+        console.log("run");
+    }
+    stop() {
+        this.spineBoy.animationState.setAnimation(0, "run-to-idle", false);
+        this.spineBoy.animationState.addAnimation(0, "idle", true);
+        EventBus.emit('animation-update', 'idle');
+        console.log("stop");
+    }
 
-    changeScene ()
-    {
+    changeScene() {
         this.scene.start('GameOver');
     }
 }
